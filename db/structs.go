@@ -6,14 +6,14 @@ import (
 )
 
 type Person struct {
-    UserId   string  `sql:"user_id"`
-	Name     string  `sql:"name"`
-	Nickname string  `sql:"nickname"`
-	Source   string  `sql:"source"`
+	UserId   string `sql:"user_id"`
+	Name     string `sql:"name"`
+	Nickname string `sql:"nickname"`
+	Source   string `sql:"source"`
 }
 
 type Entry struct {
-    TripId     string    `sql:"trip_id"`
+	TripId     string    `sql:"trip_id"`
 	UserId     string    `sql:"user_id"`
 	TripReason string    `sql:"trip_reason"`
 	DateStart  time.Time `sql:"date_start"`
@@ -35,9 +35,9 @@ func (e Entry) EndString() string {
 }
 
 func (p Person) String() string {
-    return "UserId: " + p.UserId +"\nName: " + p.Name + "\nNickname: " + p.Nickname + "\nSource: " + p.Source
+	return "UserId: " + p.UserId + "\nName: " + p.Name + "\nNickname: " + p.Nickname + "\nSource: " + p.Source
 }
 
 func (e Entry) String() string {
-    return "TripId: " + e.TripId + "\nUserId: " + e.UserId + "\nTripReason: " + e.TripReason + "\nDateStart: " + e.StartString() + "\nDateEnd: " + e.EndString() + "\nEntry: " + e.Entry + "\nBook: " + strconv.Itoa(e.Book)
+	return "TripId: " + e.TripId + "\nUserId: " + e.UserId + "\nTripReason: " + e.TripReason + "\nDateStart: " + e.StartString() + "\nDateEnd: " + e.EndString() + "\nEntry: " + e.Entry + "\nBook: " + strconv.Itoa(e.Book)
 }
