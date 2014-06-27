@@ -1,0 +1,17 @@
+<!DOCTYPE HTML>
+<html>
+    <head>
+        <title>Brandreth Visitors</title>
+        {{template "header"}}
+    </head>
+    <body>
+        {{template "navbar" $ }}
+        <div class="container">
+            <ul>
+                {{ range $i, $e := $.People }}
+                    <li>{{$e.Name}}{{ if $e.Nickname }} - {{$e.Nickname}}{{ end }}</li>
+                {{ end }}
+            </ul>
+        </div>
+    </body>
+</html>

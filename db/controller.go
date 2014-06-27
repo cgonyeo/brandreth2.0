@@ -62,6 +62,17 @@ func (c *Controller) GetPerson(userId string) *Person {
 	return person
 }
 
+func (c *Controller) GetPeople() []*Person {
+	peopleData := c.getRows(getPeople)
+	var people []*Person
+	for _, data := range peopleData {
+		person := new(Person)
+		fillStruct(person, data)
+		people = append(people, person)
+	}
+	return people
+}
+
 func (c *Controller) GetEntry(userId string, tripId string) *Entry {
 	entryData := c.getRows(getEntry, userId, tripId)
 	if len(entryData) == 0 {
@@ -73,6 +84,15 @@ func (c *Controller) GetEntry(userId string, tripId string) *Entry {
 	entry := new(Entry)
 	fillStruct(entry, entryData[0])
 	return entry
+}
+
+func (c *Controller) GetRecentTrips(num int, page int) [][]*Entry {
+	rows := c.getRows(getTripIds, num, page)
+	var trips [][]*Entry
+	for _, row := range rows {
+		trips = append(trips, c.GetTripsEntries(row["trip_id"].(string)))
+	}
+	return trips
 }
 
 func (c *Controller) GetPersonsEntries(userId string) []*Entry {
@@ -113,8 +133,8 @@ func (c *Controller) GetLastTrip() []*Entry {
 func (c *Controller) SearchForTrips(search string) []*Entry {
 	rows := c.getRows(searchQuery, c.toSearchQuery(search))
 	var entries []*Entry
-    for _, row := range rows {
-        entries = append(entries, c.GetEntry(row["user_id"].(string), row["trip_id"].(string)))
+	for _, row := range rows {
+		entries = append(entries, c.GetEntry(row["user_id"].(string), row["trip_id"].(string)))
 	}
 	return entries
 }

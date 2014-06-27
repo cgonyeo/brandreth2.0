@@ -2,13 +2,17 @@
 <html>
     <head>
         <title>{{$.TripInfo.TripReason}}</title>
+        {{ template "header" }}
     </head>
     <body>
-        <h1>{{$.TripInfo.StartString}} to {{$.TripInfo.EndString}}</h1>
-        <h2>{{$.TripInfo.TripReason}}</h2>
-        {{ range $i, $e := $.PeopleEntries }}
-            <h1>{{$e.Person.Name}}</h1>
-            <p>{{$e.Entry.Entry}}</p>
-        {{ end }}
+        {{template "navbar" $}}
+        <div class="container">
+            <h1>{{$.TripInfo.StartString}} to {{$.TripInfo.EndString}}</h1>
+            <h2>{{$.TripInfo.TripReason}}</h2>
+            {{ range $i, $e := $.PeopleEntries }}
+                <h1><a href="/person?user_id={{$e.Person.UserId}}">{{$e.Person.Name}}</a></h1>
+                <p>{{$e.Entry.Entry}}</p>
+            {{ end }}
+        </div>
     </body>
 </html>

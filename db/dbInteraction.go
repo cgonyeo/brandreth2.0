@@ -1,9 +1,10 @@
 package db
 
 import (
-    "regexp"
 	"database/sql"
 	"reflect"
+	"regexp"
+	"strings"
 
 	_ "github.com/lib/pq"
 )
@@ -55,7 +56,9 @@ FROM (SELECT entries.trip_id as trip_id,
         people.nickname, 
         entries.trip_id,
         entries.trip_reason,
-        entries.entry) e_search 
+        entries.entry,
+        entries.date_end
+        ORDER BY entries.date_end DESC) e_search 
 WHERE e_search.document @@ to_tsquery($1);
 `
 
@@ -67,7 +70,11 @@ var getEntry = "SELECT * FROM entries WHERE user_id=$1 AND trip_id=$2;"
 
 var getPerson = "SELECT * FROM people WHERE user_id=$1;"
 
+var getPeople = "SELECT * FROM people ORDER BY people.name ASC;"
+
 var getPersonsEntries = "SELECT * FROM entries WHERE user_id=$1 ORDER BY date_end DESC;"
+
+var getTripIds = "SELECT DISTINCT trip_id, date_end FROM entries ORDER BY date_end DESC LIMIT $1 OFFSET $2;"
 
 var getTripsEntries = "SELECT * FROM entries WHERE trip_id=$1 ORDER BY date_end DESC;"
 
@@ -80,8 +87,9 @@ type Controller struct {
 }
 
 func (c *Controller) toSearchQuery(search string) string {
-    re, _ := regexp.Compile("[ 	\n]+")
-    return re.ReplaceAllString(search, " & ")
+	re1, _ := regexp.Compile("[\\(\\)\\&\\|\\!]+")
+	re2, _ := regexp.Compile("[ 	\n]+")
+	return re2.ReplaceAllString(re1.ReplaceAllString(strings.Trim(search, " 	\n"), ""), " & ")
 }
 
 func (c *Controller) getSession() *sql.DB {

@@ -11,6 +11,11 @@ import (
 type TripPage struct {
 	TripInfo      *db.Entry
 	PeopleEntries []*PersonEntry
+    SearchQuery string
+}
+
+func (tp TripPage)IsActivePage(num int) bool {
+    return false
 }
 
 type TripParams struct {
@@ -19,10 +24,10 @@ type TripParams struct {
 
 func (pp *TripParams) FieldMap() binding.FieldMap {
 	return binding.FieldMap{
-        &pp.TripId: binding.Field{
-            Form:     "trip_id",
-            Required: true,
-        },
+		&pp.TripId: binding.Field{
+			Form:     "trip_id",
+			Required: true,
+		},
 	}
 }
 
@@ -47,7 +52,7 @@ func (h Handler) Trip(w http.ResponseWriter, req *http.Request) {
 		model.PeopleEntries = append(model.PeopleEntries, pe)
 	}
 
-	t, err := template.ParseFiles("templates/trip.tmpl")
+	t, err := template.ParseFiles("templates/trip.tmpl", "templates/stuff.tmpl")
 	if err != nil {
 		log.Fatal(err)
 	}

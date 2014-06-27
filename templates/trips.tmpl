@@ -1,0 +1,18 @@
+<!DOCTYPE HTML>
+<html>
+    <head>
+        <title>Brandreth Trips</title>
+        {{ template "header" }}
+    </head>
+    <body>
+        {{template "navbar"}}
+        <div class="container">
+            {{ range $i, $e := $.TripItems }}
+                <a href="/trip?trip_id={{$e.TripId}}">
+                    <h3>{{$e.Start}} to {{$e.End}} - {{$e.Reason}}</h3>
+                    <h4>{{$e.NumPeople}} people went</h4>
+                </a>
+            {{ end }}
+        </div>
+    </body>
+</html>

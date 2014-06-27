@@ -2,14 +2,18 @@
 <html>
     <head>
         <title>{{$.Person.Name}}'s Entries</title>
+        {{ template "header" }}
     </head>
     <body>
-        <h1>{{$.Person.Name}}</h1>
-        <h2>{{$.Person.Nickname}}</h2>
-        {{ range $i, $e := $.Entries }}
-            <h3>{{$e.StartString}} - {{$e.EndString}}</h3>
-            <p>{{$e.TripReason}}</p>
-            <p>{{$e.Entry}}</p>
-        {{ end }}
+        {{template "navbar" $}}
+        <div class="container">
+            <h1>{{$.Person.Name}}</h1>
+            <h2>{{$.Person.Nickname}}</h2>
+            {{ range $i, $e := $.Entries }}
+                <h3>{{$e.StartString}} - {{$e.EndString}}</h3>
+                <p>{{$e.TripReason}}</p>
+                <p>{{$e.Entry}}</p>
+            {{ end }}
+        </div>
     </body>
 </html>

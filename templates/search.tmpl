@@ -2,14 +2,18 @@
 <html>
     <head>
         <title>Search</title>
+        {{ template "header" }}
     </head>
     <body>
-        <h1>Search</h1>
-        {{ range $i, $e := $ }}
-            <h2>{{$e.Person.Name}}</h2>
-            <h3>{{$e.Entry.StartString}} to {{$e.Entry.EndString}}</h3>
-            <h4>{{$e.Entry.TripReason}}</h4>
-            <p>{{$e.Entry.Entry}}</p>
-        {{ end }}
+        {{template "navbar" $}}
+        <div class="container">
+            <h1>Search</h1>
+            {{ range $i, $e := $.PeopleEntries }}
+                <h2>{{$e.Person.Name}}</h2>
+                <h3>{{$e.Entry.StartString}} to {{$e.Entry.EndString}}</h3>
+                <h4>{{$e.Entry.TripReason}}</h4>
+                <p>{{$e.Entry.Entry}}</p>
+            {{ end }}
+        </div>
     </body>
 </html>

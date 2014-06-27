@@ -8,6 +8,15 @@ import (
 	"github.com/mholt/binding"
 )
 
+type SearchPage struct {
+	PeopleEntries []*PersonEntry
+    SearchQuery string
+}
+
+func (sp SearchPage)IsActivePage(num int) bool {
+    return false
+}
+
 type SearchParams struct {
 	Search string
 }
@@ -28,19 +37,20 @@ func (h Handler) Search(w http.ResponseWriter, req *http.Request) {
 
 	c := new(db.Controller)
 	entries := c.SearchForTrips(searchParams.Search)
-    var peopleEntries []*PersonEntry
+    searchPage := new(SearchPage)
 	for _, entry := range entries {
 		pe := new(PersonEntry)
 		pe.Person = c.GetPerson(entry.UserId)
 		pe.Entry = entry
-		peopleEntries = append(peopleEntries, pe)
+		searchPage.PeopleEntries = append(searchPage.PeopleEntries, pe)
 	}
+    searchPage.SearchQuery = searchParams.Search
 
-	t, err := template.ParseFiles("templates/search.tmpl")
+	t, err := template.ParseFiles("templates/search.tmpl", "templates/stuff.tmpl")
 	if err != nil {
 		log.Fatal(err)
 	}
-	err = t.Execute(w, peopleEntries)
+	err = t.Execute(w, searchPage)
 	if err != nil {
 		log.Fatal(err)
 	}

@@ -28,12 +28,15 @@ func importData() {
 func webapp() {
 	h := new(handler.Handler)
 	mux := http.NewServeMux()
-	mux.HandleFunc("/", h.MostRecentTrip)
+	mux.HandleFunc("/", h.Root)
 	mux.HandleFunc("/person", h.Person)
+	mux.HandleFunc("/people", h.People)
 	mux.HandleFunc("/trip", h.Trip)
+	mux.HandleFunc("/trips", h.Trips)
 	mux.HandleFunc("/search", h.Search)
 
 	n := negroni.Classic()
+    n.Use(negroni.NewStatic(http.Dir("public")))
 	n.UseHandler(mux)
 	n.Run(":3001")
 }
