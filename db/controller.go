@@ -138,3 +138,68 @@ func (c *Controller) SearchForTrips(search string) []*Entry {
 	}
 	return entries
 }
+
+func (c *Controller) GetYearsToNumVisitors() ([]int, []int) {
+	rows := c.getRows(getPeoplePerYear)
+
+	years, visitors := make([]int, len(rows)), make([]int, len(rows))
+
+	for i, row := range rows {
+		years[i] = int(row["date_part"].(float64))
+		visitors[i] = int(row["count"].(int64))
+	}
+
+	return years, visitors
+}
+
+func (c *Controller) GetYearsToNumNewVisitors() ([]int, []int) {
+	rows := c.getRows(getPeoplesFirstTrip)
+
+	years, newVisitors := make([]int, len(rows)), make([]int, len(rows))
+
+	for i, row := range rows {
+		years[i] = int(row["date_part"].(float64))
+		newVisitors[i] = int(row["count"].(int64))
+	}
+
+	return years, newVisitors
+
+}
+
+func (c *Controller) GetYearsToUniqueVisitors() ([]int, []int) {
+	rows := c.getRows(getUniquePeoplePerYear)
+
+	years, uniqueVisitors := make([]int, len(rows)), make([]int, len(rows))
+
+	for i, row := range rows {
+		years[i] = int(row["date_part"].(float64))
+		uniqueVisitors[i] = int(row["count"].(int64))
+	}
+
+	return years, uniqueVisitors
+}
+
+func (c *Controller) GetYearsToDays() ([]int, []int) {
+	rows := c.getRows(getDaysAtBrandrethPerYear)
+
+	years, days := make([]int, len(rows)), make([]int, len(rows))
+
+	for i, row := range rows {
+		years[i] = int(row["date_part"].(float64))
+		days[i] = int(row["duration"].(int64))
+	}
+
+	return years, days
+}
+
+func (c *Controller) GetYearsToVisitorsSources() ([]int, [][]string, [][]int) {
+	rows := c.getRows(numFromSourcesPerYear)
+
+	for _, row := range rows {
+		_ = int(row["date_part"].(float64))
+		_ = row["source"].(string)
+        _ = int(row["count"].(int64))
+	}
+
+	return nil,nil, nil
+}

@@ -11,11 +11,12 @@ import (
 type TripPage struct {
 	TripInfo      *db.Entry
 	PeopleEntries []*PersonEntry
-    SearchQuery string
+	SearchQuery   string
 }
 
-func (tp TripPage)IsActivePage(num int) bool {
-    return false
+func (tp TripPage) IsActivePage(num int) bool {
+	log.Debug("TripPage")
+	return false
 }
 
 type TripParams struct {
@@ -39,15 +40,14 @@ func (h Handler) Trip(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	c := new(db.Controller)
-	entries := c.GetTripsEntries(tripParams.TripId)
+	entries := h.c.GetTripsEntries(tripParams.TripId)
 	model := new(TripPage)
 	for _, entry := range entries {
 		if model.TripInfo == nil {
 			model.TripInfo = entry
 		}
 		pe := new(PersonEntry)
-		pe.Person = c.GetPerson(entry.UserId)
+		pe.Person = h.c.GetPerson(entry.UserId)
 		pe.Entry = entry
 		model.PeopleEntries = append(model.PeopleEntries, pe)
 	}

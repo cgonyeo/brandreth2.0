@@ -9,6 +9,7 @@ import (
 var log = golog.MustGetLogger("main")
 
 type Handler struct {
+	c db.Controller
 }
 
 type PersonEntry struct {

@@ -10,13 +10,14 @@ import (
 )
 
 type PersonPage struct {
-	Person  *db.Person
-	Entries []*db.Entry
-    SearchQuery string
+	Person      *db.Person
+	Entries     []*db.Entry
+	SearchQuery string
 }
 
 func (pp PersonPage) IsActivePage(num int) bool {
-    return false
+	log.Debug("PersonPage")
+	return false
 }
 
 type PersonParams struct {
@@ -37,9 +38,8 @@ func (h *Handler) Person(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	c := new(db.Controller)
-	person := c.GetPerson(personParams.UserId)
-	entries := c.GetPersonsEntries(personParams.UserId)
+	person := h.c.GetPerson(personParams.UserId)
+	entries := h.c.GetPersonsEntries(personParams.UserId)
 	model := new(PersonPage)
 	model.Person = person
 	model.Entries = entries

@@ -1,0 +1,41 @@
+<!DOCTYPE HTML>
+<html>
+    <head>
+        <title>Brandreth Stats</title>
+        {{ template "header" }}
+
+        <link href="/c3/c3.css" rel="stylesheet" type="text/css">
+
+        <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+        <script src="/c3/c3.min.js"></script>
+        <script>
+        $(document).ready(function() {
+            var chart = c3.generate({
+                bindto: '#chart',
+                data: {
+                  columns: [
+                    ['Visits'{{range $i, $e := $.NumPeoples}}, {{$e}}{{end}}],
+                    ['Brandreth Noobs'{{range $i, $e := $.NumNoobs}}, {{$e}}{{end}}],
+                    ['Unique Visitors'{{range $i, $e := $.NumUniqueVisitors}}, {{$e}}{{end}}],
+                    ['People Days Spent'{{range $i, $e := $.NumDays}}, {{$e}}{{end}}],
+                  ]
+                },
+                axis: {
+                    x: {
+                        type: 'category',
+                        label: 'Year',
+                        categories: [{{range $i, $e := $.Years}}'{{$e}}',{{end}}]
+                    }
+                }
+            });
+        });
+        </script>
+    </head>
+    <body>
+        {{template "navbar" $}}
+        <div class="container">
+            <div id="chart"></div>
+            <div id="chart2"></div>
+        </div>
+    </body>
+</html>

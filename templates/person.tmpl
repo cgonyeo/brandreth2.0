@@ -10,8 +10,10 @@
             <h1>{{$.Person.Name}}</h1>
             <h2>{{$.Person.Nickname}}</h2>
             {{ range $i, $e := $.Entries }}
-                <h3>{{$e.StartString}} - {{$e.EndString}}</h3>
-                <p>{{$e.TripReason}}</p>
+                <a href="/trip?trip_id={{$e.TripId}}">
+                    <h3>{{$e.StartString}} - {{$e.EndString}}</h3>
+                    <h4>{{$e.TripReason}}</h4>
+                </a>
                 <p>{{$e.Entry}}</p>
             {{ end }}
         </div>

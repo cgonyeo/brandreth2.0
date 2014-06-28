@@ -7,11 +7,19 @@
     <body>
         {{template "navbar" $ }}
         <div class="container">
-            <ul>
-                {{ range $i, $e := $.People }}
-                    <li>{{$e.Name}}{{ if $e.Nickname }} - {{$e.Nickname}}{{ end }}</li>
+            {{ range $userIndex, $user := $.People }}
+                {{ if $.TimeForRowStart $userIndex }}
+                    <div class="row">
                 {{ end }}
-            </ul>
+                    <div class="col-md-3">
+                        <a href="/person?user_id={{$user.UserId}}">
+                        <h4>{{$user.Name}}{{ if $user.Nickname }} - {{$user.Nickname}}{{ end }}</h4>
+                        </a>
+                    </div>
+                {{ if $.TimeForRowEnd $userIndex }}
+                    </div>
+                {{ end }}
+            {{ end }}
         </div>
     </body>
 </html>

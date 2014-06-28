@@ -5,7 +5,7 @@
         {{ template "header" }}
     </head>
     <body>
-        {{template "navbar"}}
+        {{template "navbar" $}}
         <div class="container">
             {{ range $i, $e := $.TripItems }}
                 <a href="/trip?trip_id={{$e.TripId}}">

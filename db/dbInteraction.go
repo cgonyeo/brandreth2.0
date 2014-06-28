@@ -82,12 +82,22 @@ var getAllEntries = "SELECT * FROM entries ORDER BY date_end DESC;"
 
 var getLastEntry = "SELECT * FROM entries ORDER BY date_end DESC LIMIT 1;"
 
+var getPeoplesFirstTrip = " SELECT count(user_id), date_part FROM (SELECT user_id, date_part('year', min(date_start)) FROM entries GROUP BY user_id) AS q GROUP BY date_part ORDER BY date_part;"
+
+var getPeoplePerYear = "SELECT count(*), date_part('year', date_start) FROM entries GROUP BY date_part ORDER BY date_part;"
+
+var getUniquePeoplePerYear = "SELECT count(DISTINCT user_id), date_part('year', date_start) FROM entries GROUP BY date_part ORDER BY date_part;"
+
+var getDaysAtBrandrethPerYear = "SELECT date_part('year', date_start), sum(date_end - date_start) AS duration from entries GROUP BY date_part ORDER BY date_part;"
+
+var numFromSourcesPerYear = "select count(user_id), source, date_part('year', date_start) from people INNER JOIN entries USING (user_id) GROUP BY source, date_part ORDER BY date_part;"
+
 type Controller struct {
 	db *sql.DB
 }
 
 func (c *Controller) toSearchQuery(search string) string {
-	re1, _ := regexp.Compile("[\\(\\)\\&\\|\\!]+")
+	re1, _ := regexp.Compile("[\\(\\)\\&\\|\\!'\"]+")
 	re2, _ := regexp.Compile("[ 	\n]+")
 	return re2.ReplaceAllString(re1.ReplaceAllString(strings.Trim(search, " 	\n"), ""), " & ")
 }

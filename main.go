@@ -34,9 +34,10 @@ func webapp() {
 	mux.HandleFunc("/trip", h.Trip)
 	mux.HandleFunc("/trips", h.Trips)
 	mux.HandleFunc("/search", h.Search)
+	mux.HandleFunc("/stats", h.Stats)
 
 	n := negroni.Classic()
-    n.Use(negroni.NewStatic(http.Dir("public")))
+	n.Use(negroni.NewStatic(http.Dir("public")))
 	n.UseHandler(mux)
 	n.Run(":3001")
 }
