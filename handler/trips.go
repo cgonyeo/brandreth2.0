@@ -54,10 +54,10 @@ func (h *Handler) Trips(w http.ResponseWriter, req *http.Request) {
 
 	t, err := template.ParseFiles("templates/trips.tmpl", "templates/stuff.tmpl")
 	if err != nil {
-		log.Fatal(err)
+		return
 	}
 	err = t.Execute(w, tp)
 	if err != nil {
-		log.Fatal(err)
+		return
 	}
 }

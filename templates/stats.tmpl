@@ -28,14 +28,66 @@
                     }
                 }
             });
+            var chart1 = c3.generate({
+                bindto: '#chart1',
+                data: {
+                  columns: [
+                    ['Avg Trip Duration'{{range $i, $e := $.Durations}}, {{$e}}{{end}}],
+                  ]
+                },
+                axis: {
+                    x: {
+                        type: 'category',
+                        label: 'Year',
+                        categories: [{{range $i, $e := $.Years}}'{{$e}}',{{end}}]
+                    }
+                }
+            });
+            var chart2 = c3.generate({
+                bindto: '#chart2',
+                data: {
+                  columns: [
+                  {{range $i, $e := $.SourcesForPie}}
+                    ['{{$e}}', {{index $.PeopleForPie $i}}],
+                    {{end}}
+                  ],
+                  type: 'donut'
+                },
+            });
+            var chart3 = c3.generate({
+                bindto: '#chart3',
+                data: {
+                  columns: [
+                    {{range $i, $source := $.Sources}}
+                    ['{{$source}}'{{range $j, $e := index $.NumVisitorsForSourcesPerYear $i}}, {{$e}}{{end}}],
+                    {{end}}
+                  ],
+                  type: 'bar',
+                  groups:  [
+                    [{{range $i, $e := $.Sources}}{{$e}},{{end}}]
+                  ]
+                },
+                axis: {
+                    x: {
+                        type: 'category',
+                        label: 'Year',
+                        categories: [{{range $i, $e := $.Years}}'{{$e}}',{{end}}]
+                    }
+                }
+            });
         });
         </script>
     </head>
     <body>
         {{template "navbar" $}}
         <div class="container">
+            <h1>Visitors</h1>
             <div id="chart"></div>
+            <h1>Average Trip Duration</h1>
+            <div id="chart1"></div>
+            <h1>Sources of People</h1>
             <div id="chart2"></div>
+            <div id="chart3"></div>
         </div>
     </body>
 </html>

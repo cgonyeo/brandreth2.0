@@ -19,10 +19,10 @@ func (h *Handler) Root(w http.ResponseWriter, req *http.Request) {
 
 	t, err := template.ParseFiles("templates/root.tmpl", "templates/stuff.tmpl")
 	if err != nil {
-		log.Fatal(err)
+		return
 	}
 	err = t.Execute(w, model)
 	if err != nil {
-		log.Fatal(err)
+		return
 	}
 }

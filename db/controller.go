@@ -3,7 +3,9 @@ package db
 import (
 	"fmt"
 	"os"
+	"sort"
 	"strconv"
+	"time"
 
 	golog "github.com/op/go-logging"
 )
@@ -192,14 +194,138 @@ func (c *Controller) GetYearsToDays() ([]int, []int) {
 	return years, days
 }
 
-func (c *Controller) GetYearsToVisitorsSources() ([]int, [][]string, [][]int) {
-	rows := c.getRows(numFromSourcesPerYear)
+func (c *Controller) GetAvgDurationPerYear() ([]int, []float64) {
+	rows := c.getRows(avgDurationPerYear)
 
-	for _, row := range rows {
-		_ = int(row["date_part"].(float64))
-		_ = row["source"].(string)
-        _ = int(row["count"].(int64))
+	years, durations := make([]int, len(rows)), make([]float64, len(rows))
+
+	for i, row := range rows {
+		years[i] = int(row["date_part"].(float64))
+		duration, err := strconv.ParseFloat(row["duration"].(string), 64)
+		durations[i] = duration
+		if err != nil {
+			log.Error("Parsing duration string: %v", err)
+		}
 	}
 
-	return nil,nil, nil
+	return years, durations
+}
+
+func (c *Controller) GetSources() ([]string, []int) {
+	rows := c.getRows(getSourceBreakdown)
+
+	sources, people := make([]string, len(rows)), make([]int, len(rows))
+
+	for i, row := range rows {
+		sources[i] = row["source"].(string)
+		people[i] = int(row["count"].(int64))
+	}
+
+	return sources, people
+}
+
+func (c *Controller) GetMonthCountForPerson(userId string) ([]string, []int) {
+	rows := c.getRows(getMonthsForAPerson, userId)
+
+	months, counts := make([]string, len(rows)), make([]int, len(rows))
+
+	for i, row := range rows {
+		monthint := int(row["date_part"].(float64))
+		test, err := time.Parse("1/2/2006", strconv.Itoa(monthint)+"/15/1983")
+		if err != nil {
+			log.Error("Couldnt parse month: %v", err)
+		}
+		months[i] = test.Month().String()
+		counts[i] = int(row["count"].(int64))
+	}
+
+	return months, counts
+}
+
+func (c *Controller) GetLeaderboard() ([]string, []int) {
+	rows := c.getRows(getTripCountForEveryone)
+
+	names, tripcount := make([]string, len(rows)), make([]int, len(rows))
+
+	for i, row := range rows {
+		names[i] = row["name"].(string)
+		tripcount[i] = int(row["count"].(int64))
+	}
+
+	return names, tripcount
+}
+
+func (c *Controller) GetTripReasons() []string {
+	rows := c.getRows(getReasons)
+
+	reasons := make([]string, len(rows))
+
+	for i, row := range rows {
+		reasons[i] = row["trip_reason"].(string)
+	}
+
+	return reasons
+}
+
+func (c *Controller) GetUserIdByName(name string) string {
+	rows := c.getRows(getUserByName, name)
+
+    if len(rows) < 1 {
+        return ""
+    } else {
+        return rows[0]["user_id"].(string)
+    }
+}
+
+func (c *Controller) GetYearsToVisitorsSources() ([]int, []string, [][]int) {
+	rows := c.getRows(numFromSourcesPerYear)
+
+	sourcemap := make(map[string](map[int]int))
+
+	firstyear := 3000
+	lastyear := 0
+
+	for _, row := range rows {
+		source := row["source"].(string)
+		year := int(row["date_part"].(float64))
+		numVisitors := int(row["count"].(int64))
+
+		if year < firstyear {
+			firstyear = year
+		}
+		if year > lastyear {
+			lastyear = year
+		}
+
+		if sourcemap[source] == nil {
+			sourcemap[source] = make(map[int]int)
+		}
+		sourcemap[source][year] = numVisitors
+	}
+
+	log.Debug("We're spanning year %d to year %d", firstyear, lastyear)
+
+	var years []int
+	var sources []string
+	var visitors [][]int
+
+	for key, _ := range sourcemap {
+		sources = append(sources, key)
+	}
+
+	sort.Strings(sources)
+
+	for _, source := range sources {
+		var numvisitsperyear []int
+		for i := firstyear; i <= lastyear; i++ {
+			numvisitsperyear = append(numvisitsperyear, sourcemap[source][i])
+		}
+		visitors = append(visitors, numvisitsperyear)
+	}
+
+	for i := firstyear; i <= lastyear; i++ {
+		years = append(years, i)
+	}
+
+	return years, sources, visitors
 }

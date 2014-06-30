@@ -92,6 +92,18 @@ var getDaysAtBrandrethPerYear = "SELECT date_part('year', date_start), sum(date_
 
 var numFromSourcesPerYear = "select count(user_id), source, date_part('year', date_start) from people INNER JOIN entries USING (user_id) GROUP BY source, date_part ORDER BY date_part;"
 
+var avgDurationPerYear = "SELECT date_part('year', date_start), avg(date_end - date_start) AS duration from entries GROUP BY date_part ORDER BY date_part;"
+
+var getSourceBreakdown = "SELECT count(user_id), source FROM people GROUP BY source ORDER BY source;"
+
+var getMonthsForAPerson = "select date_part('month', date_start), count(trip_id) from entries where user_id=$1 GROUP BY date_part ORDER BY date_part;"
+
+var getTripCountForEveryone = "SELECT count(trip_id), name from entries INNER JOIN people USING (user_id) GROUP BY name ORDER BY count DESC;"
+
+var getReasons = "SELECT DISTINCT trip_reason FROM entries ORDER BY trip_reason;"
+
+var getUserByName = "SELECT user_id FROM PEOPLE WHERE name=$1;"
+
 type Controller struct {
 	db *sql.DB
 }

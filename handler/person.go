@@ -12,11 +12,12 @@ import (
 type PersonPage struct {
 	Person      *db.Person
 	Entries     []*db.Entry
+	Months      []string
+	Trips       []int
 	SearchQuery string
 }
 
 func (pp PersonPage) IsActivePage(num int) bool {
-	log.Debug("PersonPage")
 	return false
 }
 
@@ -43,13 +44,14 @@ func (h *Handler) Person(w http.ResponseWriter, req *http.Request) {
 	model := new(PersonPage)
 	model.Person = person
 	model.Entries = entries
+	model.Months, model.Trips = h.c.GetMonthCountForPerson(person.UserId)
 
 	t, err := template.ParseFiles("templates/person.tmpl", "templates/stuff.tmpl")
 	if err != nil {
-		log.Fatal(err)
+		return
 	}
 	err = t.Execute(w, model)
 	if err != nil {
-		log.Fatal(err)
+		return
 	}
 }

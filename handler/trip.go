@@ -15,7 +15,6 @@ type TripPage struct {
 }
 
 func (tp TripPage) IsActivePage(num int) bool {
-	log.Debug("TripPage")
 	return false
 }
 
@@ -54,10 +53,10 @@ func (h Handler) Trip(w http.ResponseWriter, req *http.Request) {
 
 	t, err := template.ParseFiles("templates/trip.tmpl", "templates/stuff.tmpl")
 	if err != nil {
-		log.Fatal(err)
+		return
 	}
 	err = t.Execute(w, model)
 	if err != nil {
-		log.Fatal(err)
+		return
 	}
 }

@@ -11,8 +11,11 @@ type StatsPage struct {
 	NumNoobs                     []int
 	NumUniqueVisitors            []int
 	NumDays                      []int
-	SourcesPerYear               [][]string
+	Sources                      []string
 	NumVisitorsForSourcesPerYear [][]int
+	Durations                    []float64
+	SourcesForPie                []string
+	PeopleForPie                 []int
 	SearchQuery                  string
 }
 
@@ -27,14 +30,16 @@ func (h *Handler) Stats(w http.ResponseWriter, req *http.Request) {
 	_, model.NumNoobs = h.c.GetYearsToNumNewVisitors()
 	_, model.NumUniqueVisitors = h.c.GetYearsToUniqueVisitors()
 	_, model.NumDays = h.c.GetYearsToDays()
-    _, model.SourcesPerYear, model.NumVisitorsForSourcesPerYear = h.c.GetYearsToVisitorsSources()
+	_, model.Sources, model.NumVisitorsForSourcesPerYear = h.c.GetYearsToVisitorsSources()
+	_, model.Durations = h.c.GetAvgDurationPerYear()
+	model.SourcesForPie, model.PeopleForPie = h.c.GetSources()
 
 	t, err := template.ParseFiles("templates/stats.tmpl", "templates/stuff.tmpl")
 	if err != nil {
-		log.Fatal(err)
+		return
 	}
 	err = t.Execute(w, model)
 	if err != nil {
-		log.Fatal(err)
+		return
 	}
 }

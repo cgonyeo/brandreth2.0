@@ -13,7 +13,6 @@ type SearchPage struct {
 }
 
 func (sp SearchPage) IsActivePage(num int) bool {
-	log.Debug("SearchPage")
 	return false
 }
 
@@ -47,10 +46,10 @@ func (h Handler) Search(w http.ResponseWriter, req *http.Request) {
 
 	t, err := template.ParseFiles("templates/search.tmpl", "templates/stuff.tmpl")
 	if err != nil {
-		log.Fatal(err)
+		return
 	}
 	err = t.Execute(w, searchPage)
 	if err != nil {
-		log.Fatal(err)
+		return
 	}
 }

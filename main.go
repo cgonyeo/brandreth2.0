@@ -35,6 +35,9 @@ func webapp() {
 	mux.HandleFunc("/trips", h.Trips)
 	mux.HandleFunc("/search", h.Search)
 	mux.HandleFunc("/stats", h.Stats)
+	mux.HandleFunc("/leaderboard", h.Leaderboard)
+	mux.HandleFunc("/newtrip", h.NewTrip)
+	mux.HandleFunc("/submittrip", h.SubmitTrip)
 
 	n := negroni.Classic()
 	n.Use(negroni.NewStatic(http.Dir("public")))

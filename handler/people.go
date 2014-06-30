@@ -13,7 +13,6 @@ type PeoplePage struct {
 }
 
 func (pp PeoplePage) IsActivePage(num int) bool {
-	log.Debug("PeoplePage")
 	return num == 2
 }
 
@@ -30,10 +29,10 @@ func (h *Handler) People(w http.ResponseWriter, req *http.Request) {
 
 	t, err := template.ParseFiles("templates/people.tmpl", "templates/stuff.tmpl")
 	if err != nil {
-		log.Fatal(err)
+		return
 	}
 	err = t.Execute(w, PeoplePage{people, ""})
 	if err != nil {
-		log.Fatal("People: %v", err)
+		return
 	}
 }

@@ -1,0 +1,26 @@
+<!DOCTYPE HTML>
+<html>
+    <head>
+        <title>Brandreth Leaderboard</title>
+        {{ template "header" }}
+    </head>
+    <body>
+        {{template "navbar" $}}
+        <div class="container">
+            <table class="table table-striped">
+                <tr>
+                    <th>Rank</th>
+                    <th>Name</th>
+                    <th>Number of Trips</th>
+                </tr>
+                {{range $i, $e := $.Names}}
+                    <tr>
+                        <td>{{index $.Ranks $i}}</td>
+                        <td>{{$e}}</td>
+                        <td>{{index $.TripCount $i}}</td>
+                    </tr>
+                {{end}}
+            </table>
+        </div>
+    </body>
+</html>

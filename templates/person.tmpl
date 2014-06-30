@@ -3,12 +3,38 @@
     <head>
         <title>{{$.Person.Name}}'s Entries</title>
         {{ template "header" }}
+
+        <link href="/c3/c3.css" rel="stylesheet" type="text/css">
+
+        <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+        <script src="/c3/c3.min.js"></script>
+        <script>
+        $(document).ready(function() {
+            var chart = c3.generate({
+                bindto: '#chart',
+                data: {
+                  columns: [
+                    ['Visits'{{range $i, $e := $.Trips}}, {{$e}}{{end}}],
+                  ],
+                  type: 'bar'
+                },
+                axis: {
+                    x: {
+                        type: 'category',
+                        label: 'Month',
+                        categories: [{{range $i, $e := $.Months}}'{{$e}}',{{end}}]
+                    }
+                }
+            });
+        });
+        </script>
     </head>
     <body>
         {{template "navbar" $}}
         <div class="container">
             <h1>{{$.Person.Name}}</h1>
             <h2>{{$.Person.Nickname}}</h2>
+            <div id="chart"></div>
             {{ range $i, $e := $.Entries }}
                 <a href="/trip?trip_id={{$e.TripId}}">
                     <h3>{{$e.StartString}} - {{$e.EndString}}</h3>
