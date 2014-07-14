@@ -88,7 +88,7 @@ func (h *Handler) SubmitTrip(w http.ResponseWriter, req *http.Request) {
         }
 
         entry := &db.Entry{tripId, userId, reason, dateStart, dateEnd, entryData.Entry, entryData.Book}
-        //h.c.AddEntry(entry)
+        h.c.AddEntry(entry)
         log.Debug("Adding: \n%s", entry.String())
     }
     w.WriteHeader(http.StatusOK)

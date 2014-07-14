@@ -34,7 +34,7 @@
         <div class="container">
             <h1>{{$.Person.Name}}</h1>
             <h2>{{$.Person.Nickname}}</h2>
-            <div id="chart"></div>
+            <div id="chart" style="height:200px;"></div>
             {{ range $i, $e := $.Entries }}
                 <a href="/trip?trip_id={{$e.TripId}}">
                     <h3>{{$e.StartString}} - {{$e.EndString}}</h3>

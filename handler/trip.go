@@ -22,9 +22,9 @@ type TripParams struct {
 	TripId string
 }
 
-func (pp *TripParams) FieldMap() binding.FieldMap {
+func (tp *TripParams) FieldMap() binding.FieldMap {
 	return binding.FieldMap{
-		&pp.TripId: binding.Field{
+		&tp.TripId: binding.Field{
 			Form:     "trip_id",
 			Required: true,
 		},

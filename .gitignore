@@ -21,3 +21,8 @@ _testmain.go
 
 *.exe
 *.test
+*.swp
+
+brandreth2.0
+gin-bin
+guestbook.csv

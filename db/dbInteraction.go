@@ -74,7 +74,9 @@ var getPeople = "SELECT * FROM people ORDER BY people.name ASC;"
 
 var getPersonsEntries = "SELECT * FROM entries WHERE user_id=$1 ORDER BY date_end DESC;"
 
-var getTripIds = "SELECT DISTINCT trip_id, date_end FROM entries ORDER BY date_end DESC LIMIT $1 OFFSET $2;"
+var getTripIds = "SELECT DISTINCT trip_id, max(date_end) AS date_end FROM entries GROUP BY trip_id ORDER BY date_end DESC LIMIT $1 OFFSET $2;"
+
+var getNumTrips = "SELECT count(*) from (SELECT DISTINCT trip_id, max(date_end) AS date_end FROM entries GROUP BY trip_id) AS e;"
 
 var getTripsEntries = "SELECT * FROM entries WHERE trip_id=$1 ORDER BY date_end DESC;"
 
@@ -126,8 +128,15 @@ func (c *Controller) getSession() *sql.DB {
 			log.Fatal("pinging after acuiring session: %v", err)
 		}
 		c.db = db
-	}
-	return c.db
+        return c.db
+	} else {
+        err := c.db.Ping()
+		if err != nil {
+			log.Info("Unable to ping database connection, will attempt to make new connection")
+            return c.getSession()
+		}
+        return c.db
+    }
 }
 
 func fillStruct(toFill interface{}, data map[string]interface{}) {

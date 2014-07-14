@@ -89,12 +89,28 @@ func (c *Controller) GetEntry(userId string, tripId string) *Entry {
 }
 
 func (c *Controller) GetRecentTrips(num int, page int) [][]*Entry {
-	rows := c.getRows(getTripIds, num, page)
+	if page < 0 {
+		return nil
+	}
+	rows := c.getRows(getTripIds, num, page * num)
 	var trips [][]*Entry
 	for _, row := range rows {
 		trips = append(trips, c.GetTripsEntries(row["trip_id"].(string)))
 	}
 	return trips
+}
+
+func (c *Controller) GetNumPages(size int) int {
+	rows := c.getRows(getNumTrips)
+	if len(rows) != 1 {
+		return 0
+	}
+
+	trips := int(rows[0]["count"].(int64))
+	if trips % size != 0 {
+		return trips / size
+	}
+	return trips / size-1
 }
 
 func (c *Controller) GetPersonsEntries(userId string) []*Entry {

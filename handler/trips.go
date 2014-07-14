@@ -3,16 +3,36 @@ package handler
 import (
 	"html/template"
 	"net/http"
+
+	"github.com/mholt/binding"
 )
 
 type TripsPage struct {
 	TripItems   []*TripPageItem
 	SearchQuery string
+	TripsPageNum int
+	PagesToShow []int
+	NumPages int
 }
 
 func (tp TripsPage) IsActivePage(num int) bool {
-	log.Debug("TripsPage")
 	return num == 1
+}
+
+func (tp TripsPage) IsTripsPageNum(num int) bool {
+	return num == tp.TripsPageNum
+}
+
+func (tp TripsPage) IsLastPage() bool {
+	return tp.TripsPageNum == tp.NumPages
+}
+
+func (tp TripsPage) PrevPage() int {
+	return tp.TripsPageNum - 1
+}
+
+func (tp TripsPage) NextPage() int {
+	return tp.TripsPageNum + 1
 }
 
 type TripPageItem struct {
@@ -24,8 +44,30 @@ type TripPageItem struct {
 	SearchQuery string
 }
 
+type TripsParams struct {
+	Page int
+}
+
+func (tp *TripsParams) FieldMap() binding.FieldMap {
+	return binding.FieldMap{
+		&tp.Page: binding.Field{
+			Form:     "page",
+			Required: true,
+		},
+	}
+}
+
 func (h *Handler) Trips(w http.ResponseWriter, req *http.Request) {
-	trips := h.c.GetRecentTrips(10, 1)
+	tripsParams := new(TripsParams)
+	errs := binding.Bind(req, tripsParams)
+	if errs.Handle(w) {
+		log.Error("Error with binding")
+		return
+	}
+
+	page := tripsParams.Page
+
+	trips := h.c.GetRecentTrips(10, page)
 
 	tp := new(TripsPage)
 	for _, trip := range trips {
@@ -50,6 +92,14 @@ func (h *Handler) Trips(w http.ResponseWriter, req *http.Request) {
 		tripItem.TripId = tripId
 
 		tp.TripItems = append(tp.TripItems, tripItem)
+	}
+
+	tp.TripsPageNum = page
+	tp.NumPages = h.c.GetNumPages(10)
+	for i := page - 5; i < page + 5; i++ {
+		if i >= 0 && i <= tp.NumPages{
+			tp.PagesToShow = append(tp.PagesToShow, i)
+		}
 	}
 
 	t, err := template.ParseFiles("templates/trips.tmpl", "templates/stuff.tmpl")

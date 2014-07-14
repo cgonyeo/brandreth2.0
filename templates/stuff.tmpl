@@ -35,7 +35,7 @@ $(document).ready(function() {
     <!-- Collect the nav links, forms, and other content for toggling -->
     <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
       <ul class="nav navbar-nav">
-        <li {{if $.IsActivePage 1}}class="active"{{end}}><a href="/trips">Trips</a></li>
+        <li {{if $.IsActivePage 1}}class="active"{{end}}><a href="/trips?page=0">Trips</a></li>
         <li {{if $.IsActivePage 2}}class="active"{{end}}><a href="/people">People</a></li>
         <li {{if $.IsActivePage 3}}class="active"{{end}}><a href="/stats">Stats</a></li>
         <li {{if $.IsActivePage 4}}class="active"{{end}}><a href="/leaderboard">Leaderboard</a></li>
