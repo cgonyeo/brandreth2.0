@@ -1,6 +1,9 @@
 package db
 
 import (
+	"strings"
+	"html"
+	"html/template"
 	"strconv"
 	"time"
 )
@@ -20,6 +23,10 @@ type Entry struct {
 	DateEnd    time.Time `sql:"date_end"`
 	Entry      string    `sql:"entry"`
 	Book       int       `sql:"book"`
+}
+
+func (e Entry) EntryHtml() template.HTML {
+	return template.HTML(strings.Replace(html.EscapeString(e.Entry), "\n", "<br>", -1))
 }
 
 func dateToString(date time.Time) string {

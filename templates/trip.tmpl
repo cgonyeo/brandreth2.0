@@ -11,7 +11,7 @@
             <h2>{{$.TripInfo.TripReason}}</h2>
             {{ range $i, $e := $.PeopleEntries }}
                 <h3><a href="/person?user_id={{$e.Person.UserId}}">{{$e.Person.Name}}{{if $e.Person.Nickname}} - {{$e.Person.Nickname}}{{end}}</a></h3>
-                <p>{{$e.Entry.Entry}}</p>
+                <p>{{$e.Entry.EntryHtml}}</p>
             {{ end }}
         </div>
     </body>
