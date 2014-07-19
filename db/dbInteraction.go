@@ -5,6 +5,7 @@ import (
 	"reflect"
 	"regexp"
 	"strings"
+	"time"
 
 	_ "github.com/lib/pq"
 )
@@ -124,10 +125,14 @@ func (c *Controller) getSession() *sql.DB {
 		db, err := sql.Open("postgres", "postgres://brandreth:password@localhost/brandreth?sslmode=disable")
 		if err != nil {
 			log.Fatal("actuiring session: %v", err)
+			time.Sleep(15*time.Second)
+			return c.getSession()
 		}
 		err = db.Ping()
 		if err != nil {
 			log.Fatal("pinging after acuiring session: %v", err)
+			time.Sleep(15*time.Second)
+			return c.getSession()
 		}
 		c.db = db
 		return c.db
