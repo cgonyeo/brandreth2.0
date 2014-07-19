@@ -1,12 +1,12 @@
 package handler
 
 import (
-    "encoding/json"
-    "time"
+	"encoding/json"
 	"html/template"
 	"net/http"
+	"time"
 
-    "github.com/dgonyeo/brandreth2.0/db"
+	"github.com/dgonyeo/brandreth2.0/db"
 )
 
 type NewTripPage struct {
@@ -45,52 +45,116 @@ var tempTrip *TripJson
 
 type TripEntryJson struct {
 	Name      string `json:"name"`
-    Book int `json:"book"`
+	Book      int    `json:"book"`
 	Arrival   string `json:"arrival"`
 	Departure string `json:"departure"`
 	Entry     string `json:"entry"`
 }
 
 type TripJson struct {
-    Reason string `json:"reason"`
-    Entries []TripEntryJson `json:"entries"`
+	Reason  string          `json:"reason"`
+	Entries []TripEntryJson `json:"entries"`
+}
+
+type NubzReturnJson struct {
+	Nubz   []TripEntryJson `json:"noobs"`
+	TripId string          `json:"trip_id"`
 }
 
 func (h *Handler) SubmitTrip(w http.ResponseWriter, req *http.Request) {
-    decoder := json.NewDecoder(req.Body)
-    var trip TripJson
-    err := decoder.Decode(&trip)
-    if err != nil {
-        log.Error("Couldn't decode json: %v", err)
-        return
-    }
-    reason := trip.Reason
-    tripId := db.GetUniqueId()
-    for _, entryData := range trip.Entries {
-        dateStart, err := time.Parse("2006-01-02", entryData.Arrival)
-        if err != nil {
-            log.Error("Couldn't parse date: %v", err)
-            return
-        }
+	decoder := json.NewDecoder(req.Body)
+	var trip TripJson
+	err := decoder.Decode(&trip)
+	if err != nil {
+		log.Error("Couldn't decode json: %v", err)
+		return
+	}
+	var nubz []TripEntryJson
+	reason := trip.Reason
+	tripId := db.GetUniqueId()
+	for _, entryData := range trip.Entries {
+		dateStart, err := time.Parse("2006-01-02", entryData.Arrival)
+		if err != nil {
+			log.Error("Couldn't parse date: %v", err)
+			return
+		}
 
-        dateEnd, err := time.Parse("2006-01-02", entryData.Departure)
-        if err != nil {
-            log.Error("Couldn't parse date: %v", err)
-            return
-        }
+		dateEnd, err := time.Parse("2006-01-02", entryData.Departure)
+		if err != nil {
+			log.Error("Couldn't parse date: %v", err)
+			return
+		}
 
-        userId := h.c.GetUserIdByName(entryData.Name)
-        if userId == "" {
-            log.Debug("Brandreth noob detection algorithm triggered")
-            w.WriteHeader(http.StatusOK)
-            //TODO: search through list for rest of noobs, write in json
-            return
-        }
+		userId := h.c.GetUserIdByName(entryData.Name)
+		if userId == "" {
+			log.Debug("Brandreth noob detection algorithm triggered")
+			nubz = append(nubz, entryData)
+		} else {
+			entry := &db.Entry{tripId, userId, reason, dateStart, dateEnd, entryData.Entry, entryData.Book}
+			h.c.AddEntry(entry)
+			log.Debug("Adding: \n%s", entry.String())
+		}
+	}
+	w.WriteHeader(http.StatusOK)
+	if len(nubz) == 0 {
+		w.Write([]byte("{\"trip_id\": \"" + tripId + "\", \"success\": \"t\"}"))
+	} else {
+		n := &NubzReturnJson{nubz, tripId}
+		content, err := json.Marshal(n)
+		if err != nil {
+			log.Error("Marshaling nubz!: %v", err)
+			return
+		}
+		w.Write(content)
+	}
+}
 
-        entry := &db.Entry{tripId, userId, reason, dateStart, dateEnd, entryData.Entry, entryData.Book}
-        h.c.AddEntry(entry)
-        log.Debug("Adding: \n%s", entry.String())
-    }
-    w.WriteHeader(http.StatusOK)
-    w.Write([]byte("Success"))
+type NubJson struct {
+	Name      string `json:"name"`
+	Book      int    `json:"book"`
+	Arrival   string `json:"arrival"`
+	Departure string `json:"departure"`
+	Entry     string `json:"entry"`
+	Nickname string `json:"nickname"`
+	Source string `json:"source"`
+}
+
+type NubzJson struct {
+	TripId  string          `json:"trip_id"`
+	Nubz []NubJson `json:"nubz"`
+}
+
+func (h *Handler) SubmitNubz(w http.ResponseWriter, req *http.Request) {
+	decoder := json.NewDecoder(req.Body)
+	var nubz NubzJson
+	err := decoder.Decode(&nubz)
+	if err != nil {
+		log.Error("Couldn't decode json: %v", err)
+		return
+	}
+	for _, nub := range nubz.Nubz {
+		dateStart, err := time.Parse("2006-01-02", nub.Arrival)
+		if err != nil {
+			log.Error("Couldn't parse date: %v", err)
+			return
+		}
+
+		dateEnd, err := time.Parse("2006-01-02", nub.Departure)
+		if err != nil {
+			log.Error("Couldn't parse date: %v", err)
+			return
+		}
+
+		userId := h.c.AddPerson(&db.Person{
+			UserId: db.GetUniqueId(),
+			Name: nub.Name,
+			Nickname: nub.Nickname,
+			Source: nub.Source,
+		})
+
+		entry := &db.Entry{nubz.TripId, userId, h.c.GetTripReason(nubz.TripId), dateStart, dateEnd, nub.Entry, nub.Book}
+		h.c.AddEntry(entry)
+		log.Debug("Adding: \n%s", entry.String())
+	}
+	w.Write([]byte("{\"trip_id\": \"" + nubz.TripId + "\", \"success\": \"t\"}"))
 }

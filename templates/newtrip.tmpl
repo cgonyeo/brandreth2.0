@@ -1,97 +1,207 @@
 <!DOCTYPE HTML>
 <html>
-    <head>
-        <title>Brandreth - New Trip</title>
-        {{ template "header" }}
-        <script>
-            var names = [{{range $i, $e := $.Names}}{{$e}}, {{end}}]
-            var reasons = [{{range $i, $e := $.Reasons}}{{$e}}, {{end}}]
-            $(document).ready( function() {
-                $(".reasonfield").autocomplete({source: reasons});
-                var c = 0;
-                $("#addbutton").click(function(event) {
-                    if(event) {
-                        event.preventDefault();
-                        var person = $("#persontemplate");
-                        var newperson = person.clone().attr("id", "person" + c++).attr("style", "").insertAfter(person);
-                        newperson.find(".namefield").autocomplete({source: names});
-                    }
-                });
-                $("#submitbutton").click(function(event) {
-                    if(event) {
-                        event.preventDefault();
-                        var reason = $('#reason').val()
-                        var names = $('.namefield');
-                        var books = $('.book');
-                        var arrivals = $('.arrival');
-                        var departures = $('.departure');
-                        var entries = $('.entry');
-                        var json = [];
-                        for (i = 1; i < names.length; i++) {
-                            var entry = {
-                                name: names[i].value,
-                                book: parseInt(books[i].value),
-                                arrival: arrivals[i].value,
-                                departure: departures[i].value,
-                                entry: entries[i].value
-                            };
-                            json.push(entry)
-                        }
-                        $.ajax({
-                            type: "POST",
-                            url: "/submittrip",
-                            data: JSON.stringify({reason: reason, entries: json}),
-                            contentType: "application/json; charset=utf-8",
-                            dataType: "json",
-                            success: function(data){alert(data);},
-                            failure: function(errMsg) {
-                                alert(errMsg);
-                            }
-                        });
-                    }
-                });
-            });
-        </script>
-    </head>
-    <body>
-        {{template "navbar" $}}
-        <div class="container">
-            <h1>New Trip</h1>
-            <p>The trip reason field and the names fields have suggestions on them, please use them if you're entering a trip with an existing reason or an entry from someone who has signed the guestbook in the past</p>
-            <form role="form" id="tripform">
-                <div class="form-group">
-                    <label for="reason">Trip Reason</label>
-                    <input type="text" class="form-control reasonfield" id="reason" placeholder="Chill Weekend || Work Weekend || Fall Camping">
-                </div>
-                <button id="addbutton" class="btn btn-default">Add Person</button>
-                <button id="submitbutton" type="submit" class="btn btn-default">Submit Trip</button>
-                <span id="peopleholder">
-                    <div class="row">
-                        <div id="persontemplate" style="display:none;" class="col-md-4">
-                            <div class="form-group">
-                                <label>Name</label>
-                                <input type="text" class="form-control namefield" placeholder="Andrew Potter" required/>
-                            </div>
-                            <div class="form-group">
-                                <label>Book</label>
-                                <input type="number" class="form-control book" required/>
-                            </div>
-                            <div class="form-group">
-                                <label>Arrival</label>
-                                <input type="date" class="form-control arrival" required/>
-                            </div>
-                            <div class="form-group">
-                                <label>Departure</label>
-                                <input type="date" class="form-control departure" required/>
-                            </div>
-                            <div class="form-group">
-                                <label>Entry</label>
-                                <textarea rows="4" class="form-control entry"></textarea>
-                            </div>
-                        </div>
-                    </div>
-                </span>
-            </form>
-        </div>
-    </body>
+	<head>
+		<title>Brandreth - New Trip</title>
+		{{ template "header" }}
+		<script>
+			var names = [{{range $i, $e := $.Names}}{{$e}}, {{end}}]
+			var reasons = [{{range $i, $e := $.Reasons}}{{$e}}, {{end}}]
+			var trip_id = ""
+			$(document).ready( function() {
+				$(".reasonfield").autocomplete({source: reasons});
+				var c = 0;
+				var d = 0;
+				$("#addbutton").click(function(event) {
+					if(event) {
+						event.preventDefault();
+						var person = $("#persontemplate");
+						var newperson = person.clone().attr("id", "person" + c++).attr("style", "").insertAfter(person);
+						newperson.find(".namefield").autocomplete({source: names});
+					}
+				});
+				$("#submitbutton").click(function(event) {
+					if(event) {
+						event.preventDefault();
+						var reason = $('#reason').val()
+						var names = $('.namefield');
+						var books = $('.book');
+						var arrivals = $('.arrival');
+						var departures = $('.departure');
+						var entries = $('.entry');
+						var json = [];
+						for (i = 1; i < names.length; i++) {
+							var entry = {
+								name: names[i].value,
+								book: parseInt(books[i].value),
+								arrival: arrivals[i].value,
+								departure: departures[i].value,
+								entry: entries[i].value
+							};
+							json.push(entry)
+						}
+						$.ajax({
+							type: "POST",
+							url: "/submittrip",
+							data: JSON.stringify({reason: reason, entries: json}),
+							contentType: "application/json; charset=utf-8",
+							dataType: "json",
+							success: function(data){
+								if(data.hasOwnProperty("success")) {
+									alert("Success!");
+									window.location = "/trip?trip_id=" + data['trip_id'];
+								} else {
+									trip_id = data['trip_id']
+									$("#newtrip").attr("style", "display:none;");
+									$("#nubz").attr("style", "");
+									entries = data["noobs"];
+									for(entry in entries) {
+										var person = $("#noobtemplate");
+										var newperson = person.clone().attr("id", "noob" + d++).attr("style", "").insertAfter(person);
+										newperson.find(".nubname").text(entries[entry]['name'])
+										newperson.find(".nubbook").text(entries[entry]['book'])
+										newperson.find(".nubarrival").text(entries[entry]['arrival'])
+										newperson.find(".nubdeparture").text(entries[entry]['departure'])
+										newperson.find(".nubentry").text(entries[entry]['entry'])
+									}
+								}
+							},
+							failure: function(errMsg) {
+								alert(errMsg);
+							}
+						});
+					}
+				});
+				$("#submitnoobsbutton").click(function(event) {
+					if(event) {
+						event.preventDefault();
+						var names = $('.nubname');
+						var books = $('.nubbook');
+						var arrivals = $('.nubarrival');
+						var departures = $('.nubdeparture');
+						var entries = $('.nubentry');
+						var nicks = $('.nickname');
+						var sources = $('.source');
+						var json = [];
+						for (i = 1; i < names.length; i++) {
+							var entry = {
+								name: names[i].innerHTML,
+								book: parseInt(books[i].innerHTML),
+								arrival: arrivals[i].innerHTML,
+								departure: departures[i].innerHTML,
+								entry: entries[i].innerHTML,
+								nickname: nicks[i].value,
+								source: sources[i].value
+							};
+							json.push(entry)
+						}
+						$.ajax({
+							type: "POST",
+							url: "/submitnubz",
+							data: JSON.stringify({trip_id: trip_id, nubz: json}),
+							contentType: "application/json; charset=utf-8",
+							dataType: "json",
+							success: function(data){
+								alert("Success!");
+								window.location = "/trip?trip_id=" + data['trip_id'];
+							},
+							failure: function(errMsg) {
+								alert(errMsg);
+							}
+						});
+					}
+				});
+			});
+		</script>
+	</head>
+	<body>
+		{{template "navbar" $}}
+		<div class="container">
+			<span id="newtrip">
+				<h1>New Trip</h1>
+				<p>The trip reason field and the names fields have suggestions on them, please use them if you're entering a trip with an existing reason or an entry from someone who has signed the guestbook in the past</p>
+				<p>Do not use people's nicknames here, use their full names. Nicknames are recorded elsewhere.</p>
+				<p>Brandreth noobs are detected by any entry having a name that isn't in the suggestions. If you ignore the suggestions (as in, use someone's nickname or misspell their name), shit will get fucked and you'll need to get someone to delete the partial trip from the database. I'm not designing this to handle stupid data entry people, because we're all smart enough here. Right?</p>
+				<form role="form" id="tripform">
+					<div class="form-group">
+						<label for="reason">Trip Reason</label>
+						<input type="text" class="form-control reasonfield" id="reason" placeholder="Chill Weekend || Work Weekend || Fall Camping">
+					</div>
+					<div style="margin-bottom:15px;">
+						<button id="addbutton" class="btn btn-default">Add Person</button>
+						<button id="submitbutton" type="submit" class="btn btn-default">Submit Trip</button>
+					</div>
+					<span id="peopleholder">
+						<div class="row">
+							<div id="persontemplate" style="display:none;" class="col-md-4 panel panel-default">
+								<div class="form-group" style="margin-top:10px;">
+									<label>Name</label>
+									<input type="text" class="form-control namefield" placeholder="Andrew Potter" required/>
+								</div>
+								<div class="form-group">
+									<label>Book</label>
+									<input type="number" class="form-control book" required/>
+								</div>
+								<div class="form-group">
+									<label>Arrival</label>
+									<input type="date" class="form-control arrival" required/>
+								</div>
+								<div class="form-group">
+									<label>Departure</label>
+									<input type="date" class="form-control departure" required/>
+								</div>
+								<div class="form-group">
+									<label>Entry</label>
+									<textarea rows="4" class="form-control entry" style="resize:vertical;"></textarea>
+								</div>
+							</div>
+						</div>
+					</span>
+				</form>
+			</span>
+			<span id="nubz" style="display:none;">
+				<h1>New Trip</h1>
+				<h3>The Brandreth Noob Detection Algorithm has been triggered</h3>
+				<p>Brandreth noobs have been detected in the last trip entered. The entries for the returning visitors have been saved, but more information is necessary to be able to save the entries from the noobs. If you didn't expect to get here, you fucked up and didn't use the suggestions like I told you to. Go and get an RTP to delete rows from the trips table where trip_id equals whatever the trip with missing entries is.</p>
+				<div style="margin-bottom:15px;">
+					<button id="submitnoobsbutton" type="submit" class="btn btn-default">Submit Noobs</button>
+				</div>
+				<form role="form" id="tripform">
+					<span id="peopleholder">
+						<div class="row">
+							<div id="noobtemplate" style="display:none;" class="col-md-4 panel panel-default">
+								<div class="form-group" style="margin-top:10px;">
+									<label>Name</label>
+									<p class="nubname"/>
+								</div>
+								<div class="form-group">
+									<label>Book</label>
+									<p class="nubbook"/>
+								</div>
+								<div class="form-group">
+									<label>Arrival</label>
+									<p class="nubarrival"/>
+								</div>
+								<div class="form-group">
+									<label>Departure</label>
+									<p class="nubdeparture"/>
+								</div>
+								<div class="form-group">
+									<label>Entry</label>
+									<p class="nubentry"/>
+								</div>
+								<div class="form-group">
+									<label>Nickname</label>
+									<input type="text" class="form-control nickname" required/>
+								</div>
+								<div class="form-group">
+									<label>Source</label>
+									<input type="text" class="form-control source" required/>
+								</div>
+							</div>
+						</div>
+					</span>
+				</form>
+			</span>
+		</div>
+	</body>
 </html>

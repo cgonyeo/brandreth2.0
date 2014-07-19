@@ -104,7 +104,9 @@ var getTripCountForEveryone = "SELECT count(trip_id), name from entries INNER JO
 
 var getReasons = "SELECT DISTINCT trip_reason FROM entries ORDER BY trip_reason;"
 
-var getUserByName = "SELECT user_id FROM PEOPLE WHERE name=$1;"
+var getUserByName = "SELECT user_id FROM people WHERE name=$1;"
+
+var getReason = "SELECT trip_reason FROM entries WHERE trip_id=$1;"
 
 type Controller struct {
 	db *sql.DB
@@ -128,15 +130,15 @@ func (c *Controller) getSession() *sql.DB {
 			log.Fatal("pinging after acuiring session: %v", err)
 		}
 		c.db = db
-        return c.db
+		return c.db
 	} else {
-        err := c.db.Ping()
+		err := c.db.Ping()
 		if err != nil {
 			log.Info("Unable to ping database connection, will attempt to make new connection")
-            return c.getSession()
+			return c.getSession()
 		}
-        return c.db
-    }
+		return c.db
+	}
 }
 
 func fillStruct(toFill interface{}, data map[string]interface{}) {

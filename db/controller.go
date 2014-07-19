@@ -92,7 +92,7 @@ func (c *Controller) GetRecentTrips(num int, page int) [][]*Entry {
 	if page < 0 {
 		return nil
 	}
-	rows := c.getRows(getTripIds, num, page * num)
+	rows := c.getRows(getTripIds, num, page*num)
 	var trips [][]*Entry
 	for _, row := range rows {
 		trips = append(trips, c.GetTripsEntries(row["trip_id"].(string)))
@@ -107,10 +107,10 @@ func (c *Controller) GetNumPages(size int) int {
 	}
 
 	trips := int(rows[0]["count"].(int64))
-	if trips % size != 0 {
+	if trips%size != 0 {
 		return trips / size
 	}
-	return trips / size-1
+	return trips/size - 1
 }
 
 func (c *Controller) GetPersonsEntries(userId string) []*Entry {
@@ -133,6 +133,14 @@ func (c *Controller) GetTripsEntries(tripId string) []*Entry {
 		entries = append(entries, entry)
 	}
 	return entries
+}
+
+func (c *Controller) GetTripReason(tripId string) string {
+	rows := c.getRows(getReason, tripId)
+	if len(rows) == 0 {
+		return ""
+	}
+	return rows[0]["trip_reason"].(string)
 }
 
 func (c *Controller) GetLastTrip() []*Entry {
@@ -286,11 +294,11 @@ func (c *Controller) GetTripReasons() []string {
 func (c *Controller) GetUserIdByName(name string) string {
 	rows := c.getRows(getUserByName, name)
 
-    if len(rows) < 1 {
-        return ""
-    } else {
-        return rows[0]["user_id"].(string)
-    }
+	if len(rows) < 1 {
+		return ""
+	} else {
+		return rows[0]["user_id"].(string)
+	}
 }
 
 func (c *Controller) GetYearsToVisitorsSources() ([]int, []string, [][]int) {

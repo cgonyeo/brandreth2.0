@@ -8,11 +8,11 @@ import (
 )
 
 type TripsPage struct {
-	TripItems   []*TripPageItem
-	SearchQuery string
+	TripItems    []*TripPageItem
+	SearchQuery  string
 	TripsPageNum int
-	PagesToShow []int
-	NumPages int
+	PagesToShow  []int
+	NumPages     int
 }
 
 func (tp TripsPage) IsActivePage(num int) bool {
@@ -96,8 +96,8 @@ func (h *Handler) Trips(w http.ResponseWriter, req *http.Request) {
 
 	tp.TripsPageNum = page
 	tp.NumPages = h.c.GetNumPages(10)
-	for i := page - 5; i < page + 5; i++ {
-		if i >= 0 && i <= tp.NumPages{
+	for i := page - 5; i < page+5; i++ {
+		if i >= 0 && i <= tp.NumPages {
 			tp.PagesToShow = append(tp.PagesToShow, i)
 		}
 	}
