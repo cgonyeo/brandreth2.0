@@ -26,7 +26,7 @@ func IsNotAnAdmin(req *http.Request) bool {
 		return true
 	}
 	for _, name := range config.Config.Admins.Name {
-		if username == name {
+		if username[0] == name {
 			return false
 		}
 	}
