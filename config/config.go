@@ -11,6 +11,9 @@ var Config = struct {
 	Templates struct {
 		Path string
 	}
+	Database struct {
+		Url string
+	}
 	Admins struct {
 		Name []string
 	}

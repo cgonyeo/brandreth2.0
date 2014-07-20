@@ -8,6 +8,8 @@ import (
 	"time"
 
 	_ "github.com/lib/pq"
+
+	"github.com/dgonyeo/brandreth2.0/config"
 )
 
 var setupTables = `
@@ -122,7 +124,7 @@ func (c *Controller) toSearchQuery(search string) string {
 func (c *Controller) getSession() *sql.DB {
 	if c.db == nil {
 		log.Debug("opening connection")
-		db, err := sql.Open("postgres", "postgres://brandreth:password@localhost/brandreth?sslmode=disable")
+		db, err := sql.Open("postgres", config.Config.Database.Url)
 		if err != nil {
 			log.Fatal("actuiring session: %v", err)
 			time.Sleep(15 * time.Second)
