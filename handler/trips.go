@@ -108,10 +108,12 @@ func (h *Handler) Trips(w http.ResponseWriter, req *http.Request) {
 		config.Config.Templates.Path+"templates/trips.tmpl",
 		config.Config.Templates.Path+"templates/stuff.tmpl")
 	if err != nil {
+		log.Error("Error parsing the templates: %v", err)
 		return
 	}
 	err = t.Execute(w, tp)
 	if err != nil {
+		log.Error("Error executing the templates: %v", err)
 		return
 	}
 }

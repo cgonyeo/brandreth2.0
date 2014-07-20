@@ -51,10 +51,12 @@ func (h *Handler) Person(w http.ResponseWriter, req *http.Request) {
 		config.Config.Templates.Path+"templates/person.tmpl",
 		config.Config.Templates.Path+"templates/stuff.tmpl")
 	if err != nil {
+		log.Error("Error parsing the templates: %v", err)
 		return
 	}
 	err = t.Execute(w, model)
 	if err != nil {
+		log.Error("Error executing the templates: %v", err)
 		return
 	}
 }
