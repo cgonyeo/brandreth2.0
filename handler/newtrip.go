@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/dgonyeo/brandreth2.0/config"
 	"github.com/dgonyeo/brandreth2.0/db"
 )
 
@@ -19,7 +20,24 @@ func (ntp NewTripPage) IsActivePage(num int) bool {
 	return false
 }
 
+func IsNotAnAdmin(req *http.Request) bool {
+	username, ok := req.Header["X-Webauth-User"]
+	if !ok {
+		return true
+	}
+	for _, name := range config.Config.Admins.Name {
+		if username == name {
+			return false
+		}
+	}
+	return true
+}
+
 func (h *Handler) NewTrip(w http.ResponseWriter, req *http.Request) {
+	if IsNotAnAdmin(req) {
+		w.WriteHeader(http.StatusNotFound)
+		return
+	}
 	model := new(NewTripPage)
 
 	people := h.c.GetPeople()
@@ -31,7 +49,9 @@ func (h *Handler) NewTrip(w http.ResponseWriter, req *http.Request) {
 		model.Names[i] = person.Name
 	}
 
-	t, err := template.ParseFiles("templates/newtrip.tmpl", "templates/stuff.tmpl")
+	t, err := template.ParseFiles(
+		config.Config.Templates.Path+"templates/newtrip.tmpl",
+		config.Config.Templates.Path+"templates/stuff.tmpl")
 	if err != nil {
 		return
 	}
@@ -62,6 +82,10 @@ type NubzReturnJson struct {
 }
 
 func (h *Handler) SubmitTrip(w http.ResponseWriter, req *http.Request) {
+	if IsNotAnAdmin(req) {
+		w.WriteHeader(http.StatusNotFound)
+		return
+	}
 	decoder := json.NewDecoder(req.Body)
 	var trip TripJson
 	err := decoder.Decode(&trip)
@@ -115,16 +139,20 @@ type NubJson struct {
 	Arrival   string `json:"arrival"`
 	Departure string `json:"departure"`
 	Entry     string `json:"entry"`
-	Nickname string `json:"nickname"`
-	Source string `json:"source"`
+	Nickname  string `json:"nickname"`
+	Source    string `json:"source"`
 }
 
 type NubzJson struct {
-	TripId  string          `json:"trip_id"`
-	Nubz []NubJson `json:"nubz"`
+	TripId string    `json:"trip_id"`
+	Nubz   []NubJson `json:"nubz"`
 }
 
 func (h *Handler) SubmitNubz(w http.ResponseWriter, req *http.Request) {
+	if IsNotAnAdmin(req) {
+		w.WriteHeader(http.StatusNotFound)
+		return
+	}
 	decoder := json.NewDecoder(req.Body)
 	var nubz NubzJson
 	err := decoder.Decode(&nubz)
@@ -146,10 +174,10 @@ func (h *Handler) SubmitNubz(w http.ResponseWriter, req *http.Request) {
 		}
 
 		userId := h.c.AddPerson(&db.Person{
-			UserId: db.GetUniqueId(),
-			Name: nub.Name,
+			UserId:   db.GetUniqueId(),
+			Name:     nub.Name,
 			Nickname: nub.Nickname,
-			Source: nub.Source,
+			Source:   nub.Source,
 		})
 
 		entry := &db.Entry{nubz.TripId, userId, h.c.GetTripReason(nubz.TripId), dateStart, dateEnd, nub.Entry, nub.Book}

@@ -4,6 +4,7 @@ import (
 	"html/template"
 	"net/http"
 
+	"github.com/dgonyeo/brandreth2.0/config"
 	"github.com/mholt/binding"
 )
 
@@ -44,7 +45,9 @@ func (h Handler) Search(w http.ResponseWriter, req *http.Request) {
 	}
 	searchPage.SearchQuery = searchParams.Search
 
-	t, err := template.ParseFiles("templates/search.tmpl", "templates/stuff.tmpl")
+	t, err := template.ParseFiles(
+		config.Config.Templates.Path+"templates/search.tmpl",
+		config.Config.Templates.Path+"templates/stuff.tmpl")
 	if err != nil {
 		return
 	}

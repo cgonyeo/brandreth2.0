@@ -5,6 +5,8 @@ import (
 	"net/http"
 
 	"github.com/mholt/binding"
+
+	"github.com/dgonyeo/brandreth2.0/config"
 )
 
 type TripsPage struct {
@@ -102,7 +104,9 @@ func (h *Handler) Trips(w http.ResponseWriter, req *http.Request) {
 		}
 	}
 
-	t, err := template.ParseFiles("templates/trips.tmpl", "templates/stuff.tmpl")
+	t, err := template.ParseFiles(
+		config.Config.Templates.Path+"templates/trips.tmpl",
+		config.Config.Templates.Path+"templates/stuff.tmpl")
 	if err != nil {
 		return
 	}

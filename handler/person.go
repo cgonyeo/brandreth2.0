@@ -6,6 +6,7 @@ import (
 
 	"github.com/mholt/binding"
 
+	"github.com/dgonyeo/brandreth2.0/config"
 	"github.com/dgonyeo/brandreth2.0/db"
 )
 
@@ -46,7 +47,9 @@ func (h *Handler) Person(w http.ResponseWriter, req *http.Request) {
 	model.Entries = entries
 	model.Months, model.Trips = h.c.GetMonthCountForPerson(person.UserId)
 
-	t, err := template.ParseFiles("templates/person.tmpl", "templates/stuff.tmpl")
+	t, err := template.ParseFiles(
+		config.Config.Templates.Path+"templates/person.tmpl",
+		config.Config.Templates.Path+"templates/stuff.tmpl")
 	if err != nil {
 		return
 	}

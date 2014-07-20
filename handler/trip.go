@@ -4,8 +4,10 @@ import (
 	"html/template"
 	"net/http"
 
-	"github.com/dgonyeo/brandreth2.0/db"
 	"github.com/mholt/binding"
+
+	"github.com/dgonyeo/brandreth2.0/config"
+	"github.com/dgonyeo/brandreth2.0/db"
 )
 
 type TripPage struct {
@@ -51,7 +53,9 @@ func (h Handler) Trip(w http.ResponseWriter, req *http.Request) {
 		model.PeopleEntries = append(model.PeopleEntries, pe)
 	}
 
-	t, err := template.ParseFiles("templates/trip.tmpl", "templates/stuff.tmpl")
+	t, err := template.ParseFiles(
+		config.Config.Templates.Path+"templates/trip.tmpl",
+		config.Config.Templates.Path+"templates/stuff.tmpl")
 	if err != nil {
 		return
 	}

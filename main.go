@@ -1,12 +1,14 @@
 package main
 
 import (
+	"flag"
 	"net/http"
 	"time"
 
 	"github.com/codegangsta/negroni"
 	golog "github.com/op/go-logging"
 
+	"github.com/dgonyeo/brandreth2.0/config"
 	"github.com/dgonyeo/brandreth2.0/db"
 	"github.com/dgonyeo/brandreth2.0/handler"
 	"github.com/dgonyeo/brandreth2.0/importer"
@@ -15,6 +17,10 @@ import (
 var log = golog.MustGetLogger("main")
 
 func main() {
+	var path = flag.String("c", "./brandreth.conf", "The path to the config file. Defaults to ./brandreth.conf")
+	flag.Parse()
+
+	config.LoadConfig(*path)
 	webapp()
 }
 

@@ -3,6 +3,8 @@ package handler
 import (
 	"html/template"
 	"net/http"
+
+	"github.com/dgonyeo/brandreth2.0/config"
 )
 
 type LeaderPage struct {
@@ -35,7 +37,9 @@ func (h *Handler) Leaderboard(w http.ResponseWriter, req *http.Request) {
 		model.Ranks[i] = lastrank
 	}
 
-	t, err := template.ParseFiles("templates/leaderboard.tmpl", "templates/stuff.tmpl")
+	t, err := template.ParseFiles(
+		config.Config.Templates.Path+"templates/leaderboard.tmpl",
+		config.Config.Templates.Path+"templates/stuff.tmpl")
 	if err != nil {
 		return
 	}

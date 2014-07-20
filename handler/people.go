@@ -4,6 +4,7 @@ import (
 	"html/template"
 	"net/http"
 
+	"github.com/dgonyeo/brandreth2.0/config"
 	"github.com/dgonyeo/brandreth2.0/db"
 )
 
@@ -27,7 +28,9 @@ func (pp PeoplePage) TimeForRowEnd(location int) bool {
 func (h *Handler) People(w http.ResponseWriter, req *http.Request) {
 	people := h.c.GetPeople()
 
-	t, err := template.ParseFiles("templates/people.tmpl", "templates/stuff.tmpl")
+	t, err := template.ParseFiles(
+		config.Config.Templates.Path+"templates/people.tmpl",
+		config.Config.Templates.Path+"templates/stuff.tmpl")
 	if err != nil {
 		return
 	}

@@ -3,6 +3,8 @@ package handler
 import (
 	"html/template"
 	"net/http"
+
+	"github.com/dgonyeo/brandreth2.0/config"
 )
 
 type StatsPage struct {
@@ -34,7 +36,9 @@ func (h *Handler) Stats(w http.ResponseWriter, req *http.Request) {
 	_, model.Durations = h.c.GetAvgDurationPerYear()
 	model.SourcesForPie, model.PeopleForPie = h.c.GetSources()
 
-	t, err := template.ParseFiles("templates/stats.tmpl", "templates/stuff.tmpl")
+	t, err := template.ParseFiles(
+		config.Config.Templates.Path+"templates/stats.tmpl",
+		config.Config.Templates.Path+"templates/stuff.tmpl")
 	if err != nil {
 		return
 	}
