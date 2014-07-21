@@ -47,7 +47,7 @@ func webapp() {
 	mux.HandleFunc("/submitnubz", h.SubmitNubz)
 
 	n := negroni.Classic()
-	n.Use(negroni.NewStatic(http.Dir("public")))
+	n.Use(negroni.NewStatic(http.Dir(config.Config.Templates.Path + "public")))
 	n.UseHandler(mux)
 	n.Run(":3002")
 }
